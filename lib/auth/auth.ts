@@ -33,6 +33,16 @@ export const auth = betterAuth({
     },
   },
   trustedOrigins: [process.env.BETTER_AUTH_URL || "http://localhost:3000"],
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: false,
+    },
+    defaultCookieAttributes: {
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    },
+  },
+  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
 });
 
 export type Session = typeof auth.$Infer.Session;
