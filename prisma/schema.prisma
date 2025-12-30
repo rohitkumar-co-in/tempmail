@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String        @id @default(cuid())
+  name          String?
+  email         String        @unique
+  image         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  emailVerified Boolean       @default(false)
+  accounts      Account[]
+  recentInboxes RecentInbox[]
+  sessions      Session[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verification")
+}
+
+model RecentInbox {
+  id        String   @id @default(cuid())
+  userId    String
+  address   String
+  lastUsed  DateTime @default(now())
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, address])
+  @@index([userId])
+  @@index([lastUsed(sort: Desc)])
+  @@map("recent_inbox")
+}
+
+model CachedEmail {
+  id           String   @id
+  inboxAddress String
+  fromAddress  String
+  toAddress    String
+  subject      String
+  body         String   @db.Text
+  isHtml       Boolean  @default(false)
+  isRead       Boolean  @default(false)
+  receivedAt   DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([inboxAddress])
+  @@index([receivedAt(sort: Desc)])
+  @@map("cached_email")
+}
+
+// Store Gmail API configuration (refresh token for catch-all account)
+model GmailConfig {
+  id           String   @id @default("gmail_config")
+  refreshToken String
+  email        String? // The Gmail account email for reference
+  isValid      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("gmail_config")
+}
