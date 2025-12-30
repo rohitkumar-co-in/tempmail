@@ -1,7 +1,6 @@
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { auth } from "./lib/auth/auth";
+import { getServerSession } from "./lib/auth/session";
 
 // Public routes that don't require authentication
 const publicRoutes = ["/login"];
@@ -13,9 +12,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getServerSession();
 
   if (!session && !publicRoutes.includes(pathname)) {
     return NextResponse.redirect(new URL("/login", request.url));

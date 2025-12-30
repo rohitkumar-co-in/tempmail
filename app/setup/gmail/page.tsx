@@ -7,6 +7,8 @@ import { getServerSession } from "@/lib/auth/session";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Gmail Setup - TempMail",
   description: "Configure Gmail API for catch-all emails",
