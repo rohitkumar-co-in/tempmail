@@ -79,7 +79,7 @@ export function InboxLayout({ inbox, domain, fullAddress }: InboxLayoutProps) {
         isFirstLoad.current = false;
       }
     },
-    [inbox, domain, emails.length, selectedEmail]
+    [inbox, domain, emails.length, selectedEmail, router]
   );
 
   // Initial fetch

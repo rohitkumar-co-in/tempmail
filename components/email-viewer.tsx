@@ -1,7 +1,6 @@
 "use client";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
 import { Mail, Calendar, User, AtSign } from "lucide-react";
 import type { Email } from "@/lib/types";
@@ -132,7 +131,7 @@ export function EmailViewer({ email }: EmailViewerProps) {
       <ScrollArea className="flex-1">
         <div className="p-4 md:p-6">
           <Card className="p-4 md:p-6 shadow-sm">
-            <div className="text-sm leading-7 text-foreground whitespace-pre-wrap break-words">
+            <div className="text-sm leading-7 text-foreground whitespace-pre-wrap wrap-break-word">
               {plainTextBody}
             </div>
           </Card>
