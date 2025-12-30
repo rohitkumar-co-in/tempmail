@@ -16,6 +16,7 @@ import { fetchEmails, GmailTokenError } from "@/lib/gmail";
 import { inboxRequestSchema } from "@/lib/validators";
 import { logger } from "@/lib/logger";
 import type { Email, EmailListResult, ActionResult } from "@/lib/types";
+import type { RecentInbox } from "@prisma/client";
 
 /** Recent email entry returned to client */
 export interface RecentEmail {
@@ -43,18 +44,10 @@ export async function getRecentEmailsAction(): Promise<RecentEmail[]> {
       take: MAX_RECENT_EMAILS,
     });
 
-    return recentInboxes.map(
-      (inbox: {
-        id: string;
-        createdAt: Date;
-        userId: string;
-        address: string;
-        lastUsed: Date;
-      }) => ({
-        address: inbox.address,
-        lastUsed: inbox.lastUsed.toISOString(),
-      })
-    );
+    return recentInboxes.map((inbox: RecentInbox) => ({
+      address: inbox.address,
+      lastUsed: inbox.lastUsed.toISOString(),
+    }));
   } catch (error) {
     logger.error("Failed to get recent emails", { error });
     return [];
@@ -100,7 +93,7 @@ export async function addRecentEmailAction(address: string): Promise<void> {
       const toDelete = allInboxes.slice(MAX_RECENT_EMAILS);
       await prisma.recentInbox.deleteMany({
         where: {
-          id: { in: toDelete.map((i: { id: string }) => i.id) },
+          id: { in: toDelete.map((i: RecentInbox) => i.id) },
         },
       });
     }
@@ -239,12 +232,12 @@ export async function getEmailsAction(
       select: { id: true, isRead: true },
     });
 
-    const readStatusMap = new Map(
-      cachedEmails.map((e: { id: string; isRead: boolean }) => [e.id, e.isRead])
+    const readStatusMap = new Map<string, boolean>(
+      cachedEmails.map((e) => [e.id, e.isRead])
     );
 
     // Merge read status with fetched emails
-    const emailsWithReadStatus: Email[] = gmailEmails.map((email) => ({
+    const emailsWithReadStatus: Email[] = gmailEmails.map((email: Email) => ({
       ...email,
       isRead: readStatusMap.get(email.id) ?? false,
     }));
