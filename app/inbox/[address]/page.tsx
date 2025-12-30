@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { redirect, notFound } from "next/navigation";
-import { getServerSession } from "@/lib/auth/session";
+import { notFound } from "next/navigation";
 import { validateInboxAddress } from "@/lib/validators";
 import { addRecentEmailAction } from "@/app/actions";
 import { InboxLayout } from "./layout-client";
@@ -22,12 +21,6 @@ export async function generateMetadata({
 }
 
 export default async function InboxPage({ params }: InboxPageProps) {
-  const session = await getServerSession();
-
-  if (!session?.user) {
-    redirect("/login");
-  }
-
   const { address } = await params;
   const decodedAddress = decodeURIComponent(address);
   const parsed = validateInboxAddress(decodedAddress);

@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { getServerSession } from "@/lib/auth/session";
 import { getRecentEmailsAction } from "@/app/actions";
 import { DashboardLayout } from "./layout-client";
 
@@ -23,12 +21,6 @@ function getAllowedDomains(): string[] {
 }
 
 export default async function DashboardPage() {
-  const session = await getServerSession();
-
-  if (!session?.user) {
-    redirect("/login");
-  }
-
   const domains = getAllowedDomains();
   const recentEmails = await getRecentEmailsAction();
 

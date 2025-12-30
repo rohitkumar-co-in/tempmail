@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { getServerSession } from "@/lib/auth/session";
 import { AuthForm } from "./auth-form";
 import { Mail } from "lucide-react";
 
@@ -14,12 +12,6 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function LoginPage() {
-  const session = await getServerSession();
-
-  if (session?.user) {
-    redirect("/dashboard");
-  }
-
   return (
     <div className="min-h-screen flex flex-col max-w-6xl mx-auto ">
       {/* Header */}
