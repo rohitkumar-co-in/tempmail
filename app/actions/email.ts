@@ -16,7 +16,15 @@ import { fetchEmails, GmailTokenError } from "@/lib/gmail";
 import { inboxRequestSchema } from "@/lib/validators";
 import { logger } from "@/lib/logger";
 import type { Email, EmailListResult, ActionResult } from "@/lib/types";
-import type { RecentInbox } from "@prisma/client";
+
+/** Database model for recent inbox (matches Prisma schema) */
+interface RecentInboxRecord {
+  id: string;
+  userId: string;
+  address: string;
+  lastUsed: Date;
+  createdAt: Date;
+}
 
 /** Recent email entry returned to client */
 export interface RecentEmail {
@@ -44,7 +52,7 @@ export async function getRecentEmailsAction(): Promise<RecentEmail[]> {
       take: MAX_RECENT_EMAILS,
     });
 
-    return recentInboxes.map((inbox: RecentInbox) => ({
+    return recentInboxes.map((inbox: RecentInboxRecord) => ({
       address: inbox.address,
       lastUsed: inbox.lastUsed.toISOString(),
     }));
@@ -93,7 +101,7 @@ export async function addRecentEmailAction(address: string): Promise<void> {
       const toDelete = allInboxes.slice(MAX_RECENT_EMAILS);
       await prisma.recentInbox.deleteMany({
         where: {
-          id: { in: toDelete.map((i: RecentInbox) => i.id) },
+          id: { in: toDelete.map((i: RecentInboxRecord) => i.id) },
         },
       });
     }
