@@ -1,10 +1,4 @@
-import DOMPurify from "dompurify";
-import { JSDOM } from "jsdom";
-
-// Create a window object for server-side DOMPurify
-const { window } = new JSDOM("");
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const purify = DOMPurify(window as any);
+import DOMPurify from "isomorphic-dompurify";
 
 // Strict sanitization config for email HTML
 const SANITIZE_CONFIG = {
@@ -74,7 +68,7 @@ export function sanitizeHtml(html: string): string {
   if (!html) return "";
 
   // First pass: sanitize with DOMPurify
-  let sanitized = purify.sanitize(html, SANITIZE_CONFIG) as string;
+  let sanitized = DOMPurify.sanitize(html, SANITIZE_CONFIG) as string;
 
   // Force all links to open in new tab with security attributes
   sanitized = sanitized.replace(
@@ -106,8 +100,20 @@ export function sanitizePlainText(text: string): string {
 export function htmlToPlainText(html: string): string {
   if (!html) return "";
 
-  const { window } = new JSDOM(html);
-  return window.document.body.textContent || "";
+  // Remove HTML tags and decode entities without jsdom
+  return html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "") // Remove style tags
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "") // Remove script tags
+    .replace(/<[^>]+>/g, " ") // Remove all HTML tags
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, " ") // Normalize whitespace
+    .trim();
 }
 
 /**
