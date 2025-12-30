@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     "Create and manage your temporary email addresses. Generate new inboxes instantly and access your recent email addresses.",
 };
 
+// Force dynamic rendering to ensure fresh session check
+export const dynamic = "force-dynamic";
+
 // Get allowed domains from environment
 function getAllowedDomains(): string[] {
   const domains = process.env.ALLOWED_DOMAINS || "";

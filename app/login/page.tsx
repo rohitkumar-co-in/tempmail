@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     "Sign in to TempMail with your Google account to create and manage temporary email addresses.",
 };
 
+// Force dynamic rendering to ensure fresh session check
+export const dynamic = "force-dynamic";
+
 export default async function LoginPage() {
   const session = await getServerSession();
 
