@@ -1,40 +1,13 @@
 "use client";
 
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
 import { Mail, Calendar, User, AtSign } from "lucide-react";
 import type { Email } from "@/lib/types";
+import { sanitizeHtml } from "@/lib/sanitizer";
 
 interface EmailViewerProps {
   email: Email | null;
-}
-
-// Strip HTML tags and decode HTML entities
-function stripHtml(html: string): string {
-  // Remove HTML tags
-  let text = html.replace(/<[^>]*>/g, " ");
-
-  // Decode common HTML entities
-  text = text
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;/gi, "'")
-    .replace(/&apos;/gi, "'")
-    .replace(/&#(\d+);/gi, (_, num) => String.fromCharCode(parseInt(num, 10)))
-    .replace(/&#x([a-fA-F0-9]+);/gi, (_, hex) =>
-      String.fromCharCode(parseInt(hex, 16))
-    );
-
-  // Clean up whitespace
-  text = text
-    .replace(/\s+/g, " ")
-    .replace(/\n\s*\n/g, "\n\n")
-    .trim();
-
-  return text;
 }
 
 // Extract sender name from email
@@ -65,15 +38,15 @@ export function EmailViewer({ email }: EmailViewerProps) {
 
   if (!email) {
     return (
-      <div className="hidden md:flex flex-1 items-center justify-center bg-muted/20">
+      <div className="flex flex-1 items-center justify-center bg-muted/20 p-4">
         <div className="text-center">
-          <div className="h-20 w-20 mx-auto mb-4 rounded-full bg-linear-to-r from-indigo-500/10 to-purple-600/10 flex items-center justify-center">
-            <Mail className="h-10 w-10 text-indigo-500/50" />
+          <div className="h-16 w-16 md:h-20 md:w-20 mx-auto mb-4 rounded-full bg-linear-to-r from-indigo-500/10 to-purple-600/10 flex items-center justify-center">
+            <Mail className="h-8 w-8 md:h-10 md:w-10 text-indigo-500/50" />
           </div>
-          <h3 className="text-lg font-medium text-muted-foreground">
+          <h3 className="text-base md:text-lg font-medium text-muted-foreground">
             Select an email to view
           </h3>
-          <p className="text-sm text-muted-foreground/70 mt-1">
+          <p className="text-xs md:text-sm text-muted-foreground/70 mt-1">
             Choose an email from the list to see its contents
           </p>
         </div>
@@ -83,16 +56,16 @@ export function EmailViewer({ email }: EmailViewerProps) {
 
   const senderName = extractSenderName(email.from);
   const senderEmail = extractSenderEmail(email.from);
-  const plainTextBody = email.isHtml
-    ? stripHtml(email.body)
-    : email.body.replace(/<br\s*\/?>/gi, "\n");
+  const emailBody = email.isHtml
+    ? sanitizeHtml(email.body)
+    : email.body.replace(/\n/g, "<br />");
 
   return (
-    <div className="flex-1 flex flex-col bg-linear-to-b from-muted/30 to-background">
+    <div className="flex-1 flex flex-col bg-linear-to-b from-muted/30 to-background min-w-0 overflow-hidden">
       {/* Email Header */}
-      <div className="p-4 md:p-6 bg-background border-b">
+      <div className="p-4 md:p-6 bg-background border-b overflow-hidden">
         {/* Subject */}
-        <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-foreground">
+        <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-foreground wrap-break-words">
           {email.subject}
         </h1>
 
@@ -128,15 +101,17 @@ export function EmailViewer({ email }: EmailViewerProps) {
       </div>
 
       {/* Email Body */}
-      <ScrollArea className="flex-1">
-        <div className="p-4 md:p-6">
-          <Card className="p-4 md:p-6 shadow-sm">
-            <div className="text-sm leading-7 text-foreground whitespace-pre-wrap wrap-break-word">
-              {plainTextBody}
-            </div>
-          </Card>
+      <div className="flex-1 overflow-auto min-h-0">
+        <div className="p-4 md:p-6 h-full">
+          <ScrollArea className="h-full w-full">
+            <div
+              className="text-sm leading-7 text-foreground wrap-break-words [&_img]:max-w-full [&_img]:h-auto [&_table]:max-w-full [&_pre]:overflow-x-auto [&_pre]:max-w-full"
+              dangerouslySetInnerHTML={{ __html: emailBody }}
+            />
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }

@@ -201,13 +201,13 @@ function EmailList({
                     >
                       {email.subject}
                     </p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-muted-foreground truncate flex-1">
+                    <div className="overflow-hidden">
+                      <p className="text-xs text-muted-foreground line-clamp-2 break-all">
                         {email.body
                           .replace(/<[^>]*>/g, " ")
                           .replace(/\s+/g, " ")
                           .trim()
-                          .slice(0, 60)}
+                          .slice(0, 100)}
                       </p>
                     </div>
                   </button>
