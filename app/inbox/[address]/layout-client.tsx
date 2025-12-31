@@ -116,7 +116,7 @@ export function InboxLayout({ inbox, domain, fullAddress }: InboxLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden">
+    <div className="h-screen flex flex-col overflow-hidden">
       <Header showMenuButton={true} onMenuClick={() => setSidebarOpen(true)} />
       <div className="flex-1 flex overflow-hidden max-w-6xl mx-auto w-full min-w-0">
         <EmailSidebar

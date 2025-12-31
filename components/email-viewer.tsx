@@ -63,7 +63,7 @@ export function EmailViewer({ email }: EmailViewerProps) {
   return (
     <div className="flex-1 flex flex-col bg-linear-to-b from-muted/30 to-background min-w-0 overflow-hidden">
       {/* Email Header */}
-      <div className="p-4 md:p-6 bg-background border-b overflow-hidden">
+      <div className="p-4 md:p-6 bg-background border-b overflow-hidden shrink-0">
         {/* Subject */}
         <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-foreground wrap-break-words">
           {email.subject}
@@ -101,16 +101,16 @@ export function EmailViewer({ email }: EmailViewerProps) {
       </div>
 
       {/* Email Body */}
-      <div className="flex-1 overflow-auto min-h-0">
-        <div className="p-4 md:p-6 h-full">
-          <ScrollArea className="h-full w-full">
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <ScrollArea className="h-full w-full">
+          <div className="p-4 md:p-6">
             <div
               className="text-sm leading-7 text-foreground wrap-break-words [&_img]:max-w-full [&_img]:h-auto [&_table]:max-w-full [&_pre]:overflow-x-auto [&_pre]:max-w-full"
               dangerouslySetInnerHTML={{ __html: emailBody }}
             />
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </div>
+          </div>
+          <ScrollBar orientation="horizontal" className="h-2" />
+        </ScrollArea>
       </div>
     </div>
   );
